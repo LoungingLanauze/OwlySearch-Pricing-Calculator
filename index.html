@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OwlySearch × Meltwater — Pricing Calculator</title>
+<style>
+  :root {
+    --mw-teal: #79c0cc;
+    --mw-teal-dark: #5a9fac;
+    --mw-teal-light: #c2e5eb;
+    --mw-navy: #0d1b2a;
+    --mw-navy-mid: #162233;
+    --mw-navy-light: #1e2f42;
+    --mw-white: #ffffff;
+    --mw-off-white: #f4f7f9;
+    --mw-border: rgba(121,192,204,0.2);
+    --mw-border-strong: rgba(121,192,204,0.45);
+    --mw-text-muted: #8ba3b5;
+    --mw-success: #4caf8a;
+    --mw-warning: #f0a030;
+    --mw-red: #e05555;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--mw-navy);
+    color: var(--mw-white);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* === HEADER === */
+  .header {
+    background: var(--mw-navy);
+    border-bottom: 1px solid var(--mw-border);
+    padding: 22px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+  }
+  .header-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .logo-mw img {
+    height: 40px;
+    width: auto;
+    display: block;
+  }
+  .logo-sep {
+    color: var(--mw-border-strong);
+    font-size: 22px;
+    font-weight: 200;
+    line-height: 1;
+    margin: 0 4px;
+  }
+  .logo-owl {
+    background: transparent;
+    display: flex;
+    align-items: center;
+  }
+  .logo-owl img {
+    height: 38px;
+    width: auto;
+    display: block;
+    mix-blend-mode: screen;
+    filter: brightness(1.1) contrast(1.1);
+  }
+  .header-title {
+    font-size: 12px;
+    color: var(--mw-text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .header-title strong {
+    display: block;
+    color: var(--mw-teal);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+
+  /* === LAYOUT === */
+  .page-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  .page-intro {
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .page-intro h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--mw-white);
+    margin-bottom: 6px;
+  }
+  .page-intro p {
+    font-size: 14px;
+    color: var(--mw-text-muted);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* === CARDS === */
+  .card {
+    background: var(--mw-navy-light);
+    border: 1px solid var(--mw-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mw-teal);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--mw-border);
+  }
+
+  /* === FORM ELEMENTS === */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field.full { grid-column: 1 / -1; }
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mw-text-muted);
+    letter-spacing: 0.02em;
+  }
+  .req { color: var(--mw-teal); margin-left: 2px; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    background: var(--mw-navy-mid);
+    border: 1px solid var(--mw-border);
+    border-radius: var(--radius-sm);
+    color: var(--mw-white);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 10px 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--mw-teal);
+    box-shadow: 0 0 0 3px rgba(121,192,204,0.12);
+  }
+  select { cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2379c0cc' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    padding-right: 34px;
+  }
+  select option { background: var(--mw-navy-mid); color: var(--mw-white); }
+  textarea { min-height: 80px; resize: vertical; }
+
+  /* Conditional blocks */
+  .cond { display: none; }
+  .cond.show { display: contents; }
+
+  /* === PRICE BREAKDOWN === */
+  .breakdown-card {
+    background: var(--mw-navy-mid);
+    border: 1px solid var(--mw-border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .line-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--mw-border);
+    gap: 12px;
+  }
+  .line-item:last-child { border-bottom: none; }
+  .li-left { display: flex; flex-direction: column; gap: 2px; }
+  .li-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--mw-white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .li-name .icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .icon-g { background: rgba(66,133,244,0.15); color: #4285F4; }
+  .icon-t { background: rgba(255,0,80,0.12); color: #ff0050; }
+  .icon-s { background: rgba(121,192,204,0.15); color: var(--mw-teal); }
+  .li-desc { font-size: 12px; color: var(--mw-text-muted); }
+  .li-price {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--mw-white);
+    white-space: nowrap;
+  }
+  .li-price.zero { color: var(--mw-text-muted); font-size: 14px; font-weight: 400; }
+  .li-price.custom { color: var(--mw-warning); font-size: 13px; font-weight: 500; }
+  .li-price.pending { color: var(--mw-text-muted); font-size: 13px; font-style: italic; }
+
+  /* Total row */
+  .total-row {
+    background: linear-gradient(135deg, #162233 0%, #1a2d3e 100%);
+    border: 1px solid var(--mw-border-strong);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .total-label { font-size: 13px; color: var(--mw-text-muted); }
+  .total-sublabel { font-size: 12px; color: #4a6378; margin-top: 2px; }
+  .total-amount {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--mw-teal);
+    letter-spacing: -0.02em;
+  }
+  .total-amount.custom {
+    font-size: 18px;
+    color: var(--mw-warning);
+  }
+
+  /* Custom note */
+  .custom-note {
+    display: none;
+    background: rgba(240,160,48,0.08);
+    border: 1px solid rgba(240,160,48,0.3);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--mw-warning);
+    margin-bottom: 12px;
+    gap: 8px;
+    align-items: center;
+  }
+  .custom-note.show { display: flex; }
+
+  /* === BUTTON === */
+  .btn-generate {
+    width: 100%;
+    padding: 14px;
+    background: var(--mw-teal);
+    color: var(--mw-navy);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-generate:hover { background: #8fd4df; }
+  .btn-generate:active { transform: scale(0.99); }
+  .btn-generate:disabled {
+    background: #2a3d50;
+    color: #4a6378;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* === ALERTS === */
+  .alert {
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .alert.show { display: flex; }
+  .alert-success {
+    background: rgba(76,175,138,0.1);
+    border: 1px solid rgba(76,175,138,0.35);
+    color: var(--mw-success);
+  }
+  .alert-error {
+    background: rgba(224,85,85,0.1);
+    border: 1px solid rgba(224,85,85,0.35);
+    color: var(--mw-red);
+  }
+  .alert-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .alert-body { flex: 1; }
+  .alert-body strong { display: block; margin-bottom: 3px; }
+
+  /* === SPINNER === */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(13,27,42,0.4);
+    border-top-color: var(--mw-navy);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+  .spinner.show { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Helper text */
+  .field-hint {
+    font-size: 11px;
+    color: #4a6378;
+    margin-top: 3px;
+  }
+  .select-desc {
+    font-size: 12px;
+    color: var(--mw-text-muted);
+    background: rgba(121,192,204,0.06);
+    border-left: 2px solid var(--mw-teal-dark);
+    padding: 7px 10px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-top: 6px;
+    line-height: 1.5;
+    display: none;
+  }
+
+  /* Section divider label */
+  .section-note {
+    font-size: 12px;
+    color: var(--mw-text-muted);
+    background: rgba(121,192,204,0.06);
+    border: 1px solid var(--mw-border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-bottom: 16px;
+  }
+
+  /* === COGs & MARGIN SECTION === */
+  .cogs-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(240,160,48,0.08);
+    border: 1px solid rgba(240,160,48,0.35);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #f0c070;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .cogs-banner-icon { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+  .cogs-banner strong { display: block; margin-bottom: 3px; color: var(--mw-warning); }
+  .cogs-total-line { background: rgba(121,192,204,0.04); }
+
+  /* Margin controls */
+  .margin-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .margin-left { flex: 1; min-width: 180px; }
+  .margin-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 180px;
+    height: 4px;
+    background: var(--mw-border-strong);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--mw-teal);
+    cursor: pointer;
+    border: 2px solid var(--mw-navy);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--mw-teal);
+    cursor: pointer;
+    border: 2px solid var(--mw-navy);
+  }
+  .margin-number-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .margin-number-wrap input[type="number"] {
+    width: 72px;
+    text-align: right;
+    padding-right: 22px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--mw-teal);
+  }
+  .pct-symbol {
+    position: absolute;
+    right: 10px;
+    font-size: 14px;
+    color: var(--mw-text-muted);
+    pointer-events: none;
+  }
+  .approval-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    background: rgba(224,85,85,0.08);
+    border: 1px solid rgba(224,85,85,0.3);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-size: 12px;
+    color: #f08080;
+  }
+
+  /* Pricing output grid */
+  .pricing-output-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .pricing-cell {
+    background: var(--mw-navy-light);
+    border: 1px solid var(--mw-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .pricing-cell.highlight {
+    border-color: var(--mw-border-strong);
+    background: rgba(121,192,204,0.06);
+  }
+  .pricing-cell-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--mw-text-muted);
+    margin-bottom: 8px;
+  }
+  .pricing-cell-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--mw-white);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .pricing-cell-value.teal { color: var(--mw-teal); }
+  .pricing-cell-value.muted { color: var(--mw-text-muted); font-size: 16px; }
+  .pricing-cell-sub {
+    font-size: 11px;
+    color: #4a6378;
+  }
+
+  /* QC note */
+  .qc-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(121,192,204,0.06);
+    border: 1px solid var(--mw-border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--mw-text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .qc-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .qc-note strong { color: var(--mw-white); font-weight: 600; }
+  .qc-note span { color: var(--mw-teal); font-weight: 500; }
+
+  /* Button row */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    margin-bottom: 0;
+  }
+  .btn-generate { flex: 1; }
+  .btn-reset {
+    padding: 14px 20px;
+    background: transparent;
+    border: 1.5px solid rgba(121,192,204,0.3);
+    color: var(--mw-text-muted);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-reset:hover { border-color: var(--mw-teal); color: var(--mw-teal); }
+
+  /* USD margin input */
+  .margin-usd-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .usd-prefix {
+    position: absolute;
+    left: 10px;
+    font-size: 13px;
+    color: var(--mw-text-muted);
+    pointer-events: none;
+  }
+  .margin-usd-wrap input[type="number"] {
+    width: 100px;
+    padding-left: 22px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--mw-white);
+  }
+
+
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1.5px solid var(--mw-teal);
+    color: var(--mw-teal);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.15s;
+  }
+  .btn-send:hover { background: rgba(121,192,204,0.08); }
+  .btn-send:disabled { border-color: #2a3d50; color: #4a6378; cursor: not-allowed; }
+
+
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .header { flex-wrap: wrap; padding: 14px 16px; }
+    .header-title { width: 100%; text-align: center; margin-left: 0; }
+    .page-wrap { padding: 20px 14px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logos">
+    <div class="logo-mw">
+      <img src="data:image/avif;base64,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" alt="Meltwater" />
+    </div>
+    <span class="logo-sep">×</span>
+    <div class="logo-owl">
+    <img src="data:image/jpeg;base64,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" alt="OwlySearch" />
+  </div>
+  </div>
+  <div class="header-title">
+    <strong>OwlySearch × Meltwater — Pricing Calculator</strong>
+    Partner Quote Tool · Internal Use Only
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <div class="page-intro">
+    <h1>Generate a Quote</h1>
+    <p>Complete the fields below to calculate COGs and set your margin. Pricing and notifications are sent on submission.</p>
+  </div>
+
+  <!-- DEAL INFO -->
+  <div class="card">
+    <div class="card-title">Deal information</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Client name <span class="req">*</span></label>
+        <input type="text" id="client_name" placeholder="e.g. Toyota" />
+      </div>
+      <div class="field">
+        <label>Opportunity name <span class="req">*</span></label>
+        <input type="text" id="opportunity_name" placeholder="e.g. Toyota APAC Pilot" />
+      </div>
+      <div class="field full">
+        <label>Your email (Meltwater sales rep) <span class="req">*</span></label>
+        <input type="email" id="sales_rep" placeholder="yourname@meltwater.com" />
+        <p class="field-hint">Quote notification will be sent to you and vincent.ruaz@owlysearch.com</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT CONFIG -->
+  <div class="card">
+    <div class="card-title">Product configuration</div>
+
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="field full">
+        <label>Data source <span class="req">*</span></label>
+        <select id="data_source" onchange="updateFields(); updateSelectDesc('data_source', dataSourceDescs)">
+          <option value="">— Select data source —</option>
+          <option value="google">Google Search — keyword & location tracking</option>
+          <option value="tiktok">TikTok Search — topic & trend tracking</option>
+          <option value="both">Google + TikTok — full cross-platform coverage</option>
+        </select>
+        <p class="field-hint select-desc" id="data_source_desc"></p>
+      </div>
+    </div>
+
+    <!-- Google fields -->
+    <div id="google_block" class="cond">
+      <div class="section-note">
+        Google Search Behavior tracking is priced <strong>per region, per year</strong>. Each region requires a separate package.
+      </div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Google region <span class="req">*</span></label>
+          <select id="google_region">
+            <option value="">— Select region —</option>
+            <option>SEA</option>
+            <option>North Asia</option>
+            <option>South Asia</option>
+            <option>Western Europe</option>
+            <option>Eastern Europe</option>
+            <option>North America</option>
+            <option>LATAM</option>
+            <option>MEA</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Google scope <span class="req">*</span></label>
+          <select id="google_scope" onchange="recalc(); updateSelectDesc('google_scope', googleScopeDescs)">
+            <option value="">— Select scope —</option>
+            <option value="6000">Standard regional tracking — USD 6,000/yr</option>
+            <option value="8000">Advanced regional tracking — USD 8,000/yr</option>
+            <option value="custom">Enterprise / custom — Custom quote</option>
+          </select>
+          <p class="field-hint select-desc" id="google_scope_desc"></p>
+          <p class="field-hint" id="google_hint"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TikTok fields -->
+    <div id="tiktok_block" class="cond">
+      <div class="section-note">
+        TikTok Search Behavior tracking is priced <strong>per country, per year</strong>. Enter total number of countries.
+      </div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Number of TikTok countries <span class="req">*</span></label>
+          <input type="number" id="tiktok_country" min="1" max="50" value="1" placeholder="1" oninput="recalc()" />
+          <p class="field-hint">Each additional country multiplies the per-country rate</p>
+        </div>
+        <div class="field">
+          <label>TikTok topic scope <span class="req">*</span></label>
+          <select id="tiktok_scope" onchange="recalc(); updateSelectDesc('tiktok_scope', tiktokScopeDescs)">
+            <option value="">— Select scope —</option>
+            <option value="5000">1 topic — USD 5,000/country/yr</option>
+            <option value="15000">5 topics — USD 15,000/country/yr</option>
+            <option value="25000">10 topics — USD 25,000/country/yr</option>
+            <option value="custom">Enterprise / custom — Custom quote</option>
+          </select>
+          <p class="field-hint select-desc" id="tiktok_scope_desc"></p>
+          <p class="field-hint" id="tiktok_hint"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Setup -->
+    <div class="grid-2">
+      <div class="field full">
+        <label>Client setup &amp; onboarding <span class="req">*</span></label>
+        <select id="setup_support" onchange="recalc(); updateSelectDesc('setup_support', setupDescs)">
+          <option value="">— Select setup option —</option>
+          <option value="0">Meltwater-led setup — Included, no additional cost</option>
+          <option value="3000">OwlySearch-led setup — USD 3,000 one-off fee</option>
+        </select>
+        <p class="field-hint select-desc" id="setup_support_desc"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT CHALLENGE -->
+  <div class="card">
+    <div class="card-title">Client business need</div>
+    <div class="field">
+      <label>What is the client's business need or challenge? <span class="req">*</span></label>
+      <textarea id="business_need" placeholder="Describe the client's specific challenge or business question — e.g. 'Client needs to understand how consumer search intent is shifting post-campaign to optimise media spend' or 'Brand wants to benchmark share of search vs competitors across SEA markets'…" style="min-height: 100px;"></textarea>
+      <p class="field-hint">This helps OwlySearch tailor their onboarding and ensures the data package is correctly scoped to the use case.</p>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="card">
+    <div class="card-title">Additional notes</div>
+    <div class="field">
+      <textarea id="notes" placeholder="Optional — client use case, reporting requirements, timeline, or any special context for this quote…"></textarea>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btn-row">
+    <button class="btn-generate" id="btn_generate" onclick="generateQuote()">
+      <span id="btn_text">Calculate Pricing &amp; Submit</span>
+      <div class="spinner" id="btn_spinner"></div>
+      <span id="btn_arrow">→</span>
+    </button>
+    <button class="btn-reset" onclick="resetForm()" title="Clear all fields and start over">
+      ↺ Reset
+    </button>
+  </div>
+
+  <!-- PRICE BREAKDOWN — hidden until submission -->
+  <div id="price_breakdown" style="display:none; margin-top: 24px;">
+
+    <!-- COGs warning banner -->
+    <div class="cogs-banner">
+      <div class="cogs-banner-icon">⚠</div>
+      <div>
+        <strong>These are Cost of Goods (COGs) — partner cost only.</strong>
+        You must add a margin before presenting any pricing to the client. The figures below are what Meltwater pays OwlySearch, not what you quote.
+      </div>
+    </div>
+
+    <div class="card-title" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--mw-teal);margin-bottom:12px;">
+      COGs breakdown
+      <span style="flex:1;height:1px;background:var(--mw-border);display:inline-block;margin-left:10px;vertical-align:middle;"></span>
+    </div>
+
+    <div class="breakdown-card">
+      <div id="google_line" class="line-item" style="display:none;">
+        <div class="li-left">
+          <div class="li-name"><span class="icon icon-g">G</span> Google Search</div>
+          <div class="li-desc" id="google_desc"></div>
+        </div>
+        <div class="li-price" id="google_price_display">—</div>
+      </div>
+      <div id="tiktok_line" class="line-item" style="display:none;">
+        <div class="li-left">
+          <div class="li-name"><span class="icon icon-t">T</span> TikTok Search</div>
+          <div class="li-desc" id="tiktok_desc"></div>
+        </div>
+        <div class="li-price" id="tiktok_price_display">—</div>
+      </div>
+      <div id="setup_line" class="line-item" style="display:none;">
+        <div class="li-left">
+          <div class="li-name"><span class="icon icon-s">⚙</span> Client setup &amp; onboarding</div>
+          <div class="li-desc" id="setup_desc"></div>
+        </div>
+        <div class="li-price" id="setup_price_display">—</div>
+      </div>
+      <div class="line-item cogs-total-line">
+        <div class="li-left">
+          <div class="li-name" style="font-weight:600;">Total COGs</div>
+          <div class="li-desc">Partner cost — do not share with client</div>
+        </div>
+        <div class="li-price" id="cogs_total_display" style="color:var(--mw-text-muted);">—</div>
+      </div>
+    </div>
+
+    <!-- MARGIN SECTION -->
+    <div id="margin_section" style="display:none;">
+      <div class="card-title" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--mw-teal);margin-bottom:12px;margin-top:20px;">
+        Margin &amp; client pricing
+        <span style="flex:1;height:1px;background:var(--mw-border);display:inline-block;margin-left:10px;vertical-align:middle;"></span>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="margin-row">
+          <div class="margin-left">
+            <label style="font-size:13px;font-weight:500;color:var(--mw-white);display:block;margin-bottom:4px;">Margin</label>
+            <p style="font-size:12px;color:var(--mw-text-muted);">Minimum 30%. Below 30% requires partnership team approval.</p>
+          </div>
+          <div class="margin-inputs">
+            <input type="range" id="margin_slider" min="1" max="80" value="30" step="1" oninput="syncMargin('slider')" />
+            <div class="margin-number-wrap">
+              <input type="number" id="margin_input" min="1" max="80" value="30" step="1" oninput="syncMargin('pct')" />
+              <span class="pct-symbol">%</span>
+            </div>
+            <div class="margin-usd-wrap">
+              <span class="usd-prefix">$</span>
+              <input type="number" id="margin_usd_input" min="0" step="100" placeholder="0" oninput="syncMargin('usd')" />
+            </div>
+          </div>
+        </div>
+
+        <div id="approval_warning" class="approval-warning" style="display:none;">
+          <span>🔒</span>
+          <span>Margin below 30% — partnership team approval required before quoting this price to the client.</span>
+        </div>
+      </div>
+
+      <!-- Client-facing pricing output -->
+      <div class="pricing-output-grid">
+        <div class="pricing-cell">
+          <div class="pricing-cell-label">COGs (your cost)</div>
+          <div class="pricing-cell-value muted" id="out_cogs">—</div>
+          <div class="pricing-cell-sub">Do not share with client</div>
+        </div>
+        <div class="pricing-cell highlight">
+          <div class="pricing-cell-label">Your margin</div>
+          <div class="pricing-cell-value teal" id="out_margin_pct">—</div>
+          <div class="pricing-cell-sub" id="out_margin_usd">—</div>
+          <div class="pricing-cell-sub" style="margin-top:4px;color:var(--mw-teal);font-size:10px;font-weight:600;letter-spacing:0.04em;">Counts toward QC &amp; CC</div>
+        </div>
+        <div class="pricing-cell">
+          <div class="pricing-cell-label">Client-facing ACV</div>
+          <div class="pricing-cell-value" id="out_acv">—</div>
+          <div class="pricing-cell-sub">Total to quote to client</div>
+        </div>
+      </div>
+
+      <div class="qc-note">
+        <span class="qc-icon">💡</span>
+        <div>
+          <strong>Your quota credit (QC &amp; CC):</strong> Only the <em>margin</em> you add counts toward your QC and CC — not the full ACV. The ACV is what you quote to the client; the margin is your contribution. At 30% margin on a <span id="qc_example_cogs">—</span> COGs base, your margin would be <span id="qc_example_margin">—</span>.
+        </div>
+      </div>
+    </div>
+
+    <div class="custom-note" id="custom_note">
+      <span>⚠</span>
+      One or more packages require a custom quote. Contact vincent.ruaz@owlysearch.com to confirm COGs before applying margin.
+    </div>
+  </div>
+
+  </div>
+
+  <div class="alert alert-success" id="alert_success">
+    <span class="alert-icon">✓</span>
+    <div class="alert-body">
+      <strong>Quote sent successfully</strong>
+      <span id="success_detail"></span>
+    </div>
+  </div>
+  <div class="alert alert-error" id="alert_error">
+    <span class="alert-icon">!</span>
+    <div class="alert-body">
+      <strong>Could not complete request</strong>
+      <span id="error_detail"></span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GOOGLE_HINTS = {
+  "6000": "Up to 1M records · 1,000 active keywords · 100 locations",
+  "8000": "Up to 2M records · 5,000 active keywords · 200 locations",
+  "custom": "Custom records, keywords & locations — pricing on request"
+};
+const TIKTOK_HINTS = {
+  "5000": "1 topic per country",
+  "15000": "Up to 5 topics per country",
+  "25000": "Up to 10 topics per country",
+  "custom": "Custom topic coverage — pricing on request"
+};
+
+// Stores computed COGs after submission
+let computedCogs = 0;
+let cogsIsCustom = false;
+
+function fmt(n) {
+  return "USD " + Math.round(n).toLocaleString("en-US");
+}
+
+function updateFields() {
+  const ds = document.getElementById("data_source").value;
+  const gBlock = document.getElementById("google_block");
+  const tBlock = document.getElementById("tiktok_block");
+  gBlock.className = (ds === "google" || ds === "both") ? "cond show" : "cond";
+  tBlock.className = (ds === "tiktok" || ds === "both") ? "cond show" : "cond";
+}
+
+// Internal price calculation — does NOT display results
+function calcCogs() {
+  const ds = document.getElementById("data_source").value;
+  const gVal = document.getElementById("google_scope").value;
+  const tVal = document.getElementById("tiktok_scope").value;
+  const tCountry = Math.max(1, parseInt(document.getElementById("tiktok_country").value) || 1);
+  const setupVal = document.getElementById("setup_support").value;
+  const hasG = ds === "google" || ds === "both";
+  const hasT = ds === "tiktok" || ds === "both";
+
+  let gPrice = 0, tPrice = 0, setupPrice = 0, isCustom = false;
+  if (hasG && gVal) { if (gVal === "custom") { isCustom = true; } else { gPrice = parseInt(gVal); } }
+  if (hasT && tVal) { if (tVal === "custom") { isCustom = true; } else { tPrice = parseInt(tVal) * tCountry; } }
+  if (setupVal !== "") { setupPrice = parseInt(setupVal); }
+
+  return { gPrice, tPrice, setupPrice, isCustom, hasG, hasT, tCountry, gVal, tVal, setupVal };
+}
+
+function renderBreakdown() {
+  const ds = document.getElementById("data_source").value;
+  const { gPrice, tPrice, setupPrice, isCustom, hasG, hasT, tCountry, gVal, tVal, setupVal } = calcCogs();
+
+  // Google line
+  if (hasG) {
+    document.getElementById("google_line").style.display = "flex";
+    document.getElementById("google_desc").textContent = GOOGLE_HINTS[gVal] || "Select scope above";
+    if (gVal === "custom") {
+      setPriceEl("google_price_display", "Custom quote", "custom");
+    } else if (gVal) {
+      setPriceEl("google_price_display", fmt(gPrice), "");
+    } else {
+      setPriceEl("google_price_display", "—", "pending");
+    }
+  } else {
+    document.getElementById("google_line").style.display = "none";
+  }
+
+  // TikTok line
+  if (hasT) {
+    document.getElementById("tiktok_line").style.display = "flex";
+    if (tVal === "custom") {
+      setPriceEl("tiktok_price_display", "Custom quote", "custom");
+      document.getElementById("tiktok_desc").textContent = TIKTOK_HINTS[tVal];
+    } else if (tVal) {
+      setPriceEl("tiktok_price_display", fmt(tPrice), "");
+      document.getElementById("tiktok_desc").textContent = tCountry + " countr" + (tCountry !== 1 ? "ies" : "y") + " × " + TIKTOK_HINTS[tVal];
+    } else {
+      setPriceEl("tiktok_price_display", "—", "pending");
+      document.getElementById("tiktok_desc").textContent = "Select scope above";
+    }
+  } else {
+    document.getElementById("tiktok_line").style.display = "none";
+  }
+
+  // Setup line
+  if (setupVal !== "") {
+    document.getElementById("setup_line").style.display = "flex";
+    const sp = parseInt(setupVal);
+    if (sp === 0) {
+      setPriceEl("setup_price_display", "Included", "zero");
+      document.getElementById("setup_desc").textContent = "Meltwater manages onboarding";
+    } else {
+      setPriceEl("setup_price_display", fmt(sp), "");
+      document.getElementById("setup_desc").textContent = "OwlySearch multilingual onboarding, normalisation & QA";
+    }
+  } else {
+    document.getElementById("setup_line").style.display = "none";
+  }
+
+  // COGs total row
+  if (isCustom) {
+    setPriceEl("cogs_total_display", "Custom — contact OwlySearch", "custom");
+  } else {
+    const total = gPrice + tPrice + setupPrice;
+    setPriceEl("cogs_total_display", fmt(total), total > 0 ? "" : "pending");
+  }
+
+  // Custom note
+  document.getElementById("custom_note").className = isCustom ? "custom-note show" : "custom-note";
+
+  return { gPrice, tPrice, setupPrice, isCustom };
+}
+
+// Runs only after form submission
+function recalc() { /* no-op — pricing shown after submit only */ }
+
+function syncMargin(source) {
+  const slider = document.getElementById("margin_slider");
+  const pctInput = document.getElementById("margin_input");
+  const usdInput = document.getElementById("margin_usd_input");
+
+  if (source === "slider" || source === "pct") {
+    let val = source === "slider" ? parseInt(slider.value) : parseInt(pctInput.value);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 80) val = 80;
+    slider.value = val;
+    pctInput.value = val;
+    // Derive USD from %
+    if (computedCogs > 0) {
+      const factor = 1 - val / 100;
+      const acv = factor > 0 ? computedCogs / factor : computedCogs;
+      usdInput.value = Math.round(acv - computedCogs);
+    }
+    updateMarginCalc(val);
+  } else if (source === "usd") {
+    // Derive % from USD amount
+    const usdVal = parseFloat(usdInput.value) || 0;
+    if (computedCogs > 0) {
+      const acv = computedCogs + usdVal;
+      const pct = acv > 0 ? Math.round((usdVal / acv) * 100) : 0;
+      const clamped = Math.max(1, Math.min(80, pct));
+      slider.value = clamped;
+      pctInput.value = clamped;
+      updateMarginCalc(clamped);
+    }
+  }
+}
+
+function updateMarginCalc(marginPct) {
+  if (cogsIsCustom || computedCogs === 0) return;
+
+  // ACV = COGs / (1 - margin/100)
+  const factor = 1 - (marginPct / 100);
+  const acv = factor > 0 ? computedCogs / factor : computedCogs;
+  const marginUsd = acv - computedCogs;
+
+  document.getElementById("out_cogs").textContent = fmt(computedCogs);
+  document.getElementById("out_margin_pct").textContent = marginPct + "%";
+  document.getElementById("out_margin_usd").textContent = fmt(marginUsd);
+  document.getElementById("out_acv").textContent = fmt(acv);
+
+  // Keep USD input in sync when driven by slider/pct
+  const usdInput = document.getElementById("margin_usd_input");
+  if (document.activeElement !== usdInput) {
+    usdInput.value = Math.round(marginUsd);
+  }
+
+  // QC note — 30% example
+  const exampleAcv = computedCogs / 0.70;
+  const exampleMarginUsd = exampleAcv - computedCogs;
+  document.getElementById("qc_example_cogs").textContent = fmt(computedCogs);
+  document.getElementById("qc_example_margin").textContent = fmt(exampleMarginUsd);
+
+  // Approval warning
+  document.getElementById("approval_warning").style.display = marginPct < 30 ? "flex" : "none";
+
+  // Slider track colour
+  const slider = document.getElementById("margin_slider");
+  const pct = ((marginPct - 1) / 79) * 100;
+  const colour = marginPct < 30 ? "#e05555" : "#79c0cc";
+  slider.style.background = `linear-gradient(to right, ${colour} ${pct}%, rgba(121,192,204,0.25) ${pct}%)`;
+}
+
+
+function setPriceEl(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = "li-price" + (cls ? " " + cls : "");
+}
+
+function getVal(id) { return document.getElementById(id).value.trim(); }
+
+function buildPayload() {
+  const ds = document.getElementById("data_source").value;
+  const hasG = ds === "google" || ds === "both";
+  const hasT = ds === "tiktok" || ds === "both";
+  const gVal = hasG ? document.getElementById("google_scope").value : "";
+  const tVal = hasT ? document.getElementById("tiktok_scope").value : "";
+  const tCountry = hasT ? Math.max(1, parseInt(document.getElementById("tiktok_country").value) || 1) : 0;
+  const setupVal = document.getElementById("setup_support").value;
+
+  let gPrice = 0, tPrice = 0, setupPrice = 0, isCustom = false;
+  if (hasG && gVal) { if (gVal === "custom") { isCustom = true; } else { gPrice = parseInt(gVal); } }
+  if (hasT && tVal) { if (tVal === "custom") { isCustom = true; } else { tPrice = parseInt(tVal) * tCountry; } }
+  if (setupVal !== "") { setupPrice = parseInt(setupVal); }
+
+  const dsScopeLabels = {
+    "": "", "google": "Google Search", "tiktok": "TikTok Search", "both": "Google + TikTok"
+  };
+  const gScopeLabels = {
+    "": "", "6000": "Standard regional tracking", "8000": "Advanced regional tracking", "custom": "Enterprise / custom"
+  };
+  const tScopeLabels = {
+    "": "", "5000": "1 topic", "15000": "5 topics", "25000": "10 topics", "custom": "Enterprise / custom"
+  };
+  const setupLabels = {
+    "": "", "0": "Meltwater setup", "3000": "OwlySearch setup"
+  };
+
+  return {
+    client_name: getVal("client_name"),
+    opportunity_name: getVal("opportunity_name"),
+    sales_rep: getVal("sales_rep"),
+    data_source: dsScopeLabels[ds] || ds,
+    google_region: hasG ? getVal("google_region") : "",
+    google_scope: hasG ? (gScopeLabels[gVal] || gVal) : "",
+    tiktok_countries: hasT ? tCountry : "",
+    tiktok_scope: hasT ? (tScopeLabels[tVal] || tVal) : "",
+    setup_support: setupLabels[setupVal] || setupVal,
+    google_price: isCustom ? "Custom" : (hasG ? gPrice : ""),
+    tiktok_price: isCustom ? "Custom" : (hasT ? tPrice : ""),
+    setup_price: setupPrice,
+    total_quote: isCustom ? "Custom quote required" : fmt(gPrice + tPrice + setupPrice),
+    notes: getVal("notes"),
+    business_need: getVal("business_need"),
+    timestamp: new Date().toISOString().replace("T", " ").substring(0, 19)
+  };
+}
+
+async function generateQuote() {
+  const client = getVal("client_name");
+  const opp = getVal("opportunity_name");
+  const rep = getVal("sales_rep");
+  const ds = document.getElementById("data_source").value;
+  const setup = document.getElementById("setup_support").value;
+  const bizNeed = getVal("business_need");
+
+  if (!client || !opp || !rep || !ds || setup === "" || !bizNeed) {
+    showAlert("error", "Please fill in all required fields before submitting.");
+    return;
+  }
+  if (!rep.includes("@")) {
+    showAlert("error", "Please enter a valid email address for the sales rep.");
+    return;
+  }
+
+  clearAlerts();
+  setLoading(true);
+
+  // Compute and render COGs
+  const { gPrice, tPrice, setupPrice, isCustom } = renderBreakdown();
+  computedCogs = gPrice + tPrice + setupPrice;
+  cogsIsCustom = isCustom;
+
+  // Show pricing section
+  document.getElementById("price_breakdown").style.display = "block";
+
+  const marginSection = document.getElementById("margin_section");
+  if (!isCustom && computedCogs > 0) {
+    marginSection.style.display = "block";
+    document.getElementById("margin_slider").value = 30;
+    document.getElementById("margin_input").value = 30;
+    const initUsd = Math.round(computedCogs / 0.70 - computedCogs);
+    document.getElementById("margin_usd_input").value = initUsd;
+    updateMarginCalc(30);
+  } else {
+    marginSection.style.display = "none";
+  }
+
+  // Build payload (after margin is initialised)
+  const payload = buildPayload();
+
+  // ──────────────────────────────────────────────────────────────────
+  // INTEGRATION — configure before going live:
+  // 1. EmailJS: https://emailjs.com — sign up, create service + template
+  //    Replace: YOUR_EMAILJS_SERVICE_ID, YOUR_EMAILJS_TEMPLATE_ID, YOUR_EMAILJS_PUBLIC_KEY
+  // 2. Google Sheets Apps Script: deploy doPost handler, paste URL into SHEETS_URL
+  // ──────────────────────────────────────────────────────────────────
+  const EMAILJS_SERVICE_ID = "YOUR_EMAILJS_SERVICE_ID";
+  const EMAILJS_TEMPLATE_ID = "YOUR_EMAILJS_TEMPLATE_ID";
+  const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
+  const SHEETS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
+  const isConfigured = !EMAILJS_SERVICE_ID.startsWith("YOUR_");
+
+  let emailOk = false, sheetsOk = false;
+
+  if (isConfigured) {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: rep + ",vincent.ruaz@owlysearch.com",
+        client_name: payload.client_name,
+        opportunity_name: payload.opportunity_name,
+        sales_rep: payload.sales_rep,
+        data_source: payload.data_source,
+        google_region: payload.google_region || "N/A",
+        google_scope: payload.google_scope || "N/A",
+        tiktok_countries: payload.tiktok_countries || "N/A",
+        tiktok_scope: payload.tiktok_scope || "N/A",
+        setup_support: payload.setup_support,
+        cogs_total: payload.cogs_total,
+        margin_pct: payload.margin_pct,
+        margin_usd: payload.margin_usd,
+        client_acv: payload.client_acv,
+        business_need: payload.business_need,
+        notes: payload.notes || "None",
+        timestamp: payload.timestamp
+      }, EMAILJS_PUBLIC_KEY);
+      emailOk = true;
+    } catch(e) { console.error("EmailJS error:", e); }
+
+    try {
+      await fetch(SHEETS_URL, {
+        method: "POST", mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      sheetsOk = true;
+    } catch(e) { console.error("Sheets error:", e); }
+  } else {
+    await new Promise(r => setTimeout(r, 800));
+    emailOk = true; sheetsOk = true;
+  }
+
+  setLoading(false);
+  document.getElementById("btn_text").textContent = "Recalculate & Resubmit";
+
+  if (emailOk && sheetsOk) {
+    const msg = isConfigured
+      ? `Notification sent to ${rep} and vincent.ruaz@owlysearch.com. Logged to Google Sheets. Client ACV: ${payload.client_acv} (Margin: ${payload.margin_pct} / ${payload.margin_usd}).`
+      : `[Demo mode] COGs: ${payload.cogs_total} · Margin: ${payload.margin_pct} (${payload.margin_usd}) · Client ACV: ${payload.client_acv}. Configure EmailJS and Google Apps Script to enable live sending.`;
+    showAlert("success", msg);
+  } else {
+    const parts = [!emailOk && "email", !sheetsOk && "Google Sheets"].filter(Boolean);
+    showAlert("error", `Could not complete: ${parts.join(" and ")}. Check console for details.`);
+  }
+
+  document.getElementById("price_breakdown").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetForm() {
+  // Reset all inputs
+  ["client_name","opportunity_name","sales_rep","notes","business_need"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  ["data_source","google_region","google_scope","tiktok_scope","setup_support"].forEach(id => {
+    document.getElementById(id).selectedIndex = 0;
+  });
+  document.getElementById("tiktok_country").value = 1;
+
+  // Hide conditional blocks
+  document.getElementById("google_block").className = "cond";
+  document.getElementById("tiktok_block").className = "cond";
+
+  // Clear description hints
+  ["data_source_desc","google_scope_desc","tiktok_scope_desc","setup_support_desc","google_hint","tiktok_hint"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ""; el.style.display = "none"; }
+  });
+
+  // Hide pricing section
+  document.getElementById("price_breakdown").style.display = "none";
+  document.getElementById("margin_section").style.display = "none";
+
+  // Reset state
+  computedCogs = 0;
+  cogsIsCustom = false;
+
+  // Reset button label
+  document.getElementById("btn_text").textContent = "Calculate Pricing & Submit";
+
+  clearAlerts();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function buildPayload() {
+  const ds = document.getElementById("data_source").value;
+  const hasG = ds === "google" || ds === "both";
+  const hasT = ds === "tiktok" || ds === "both";
+  const gVal = hasG ? document.getElementById("google_scope").value : "";
+  const tVal = hasT ? document.getElementById("tiktok_scope").value : "";
+  const tCountry = hasT ? Math.max(1, parseInt(document.getElementById("tiktok_country").value) || 1) : 0;
+  const setupVal = document.getElementById("setup_support").value;
+  const marginPct = parseInt(document.getElementById("margin_input").value) || 30;
+
+  let gPrice = 0, tPrice = 0, setupPrice = 0, isCustom = false;
+  if (hasG && gVal) { if (gVal === "custom") { isCustom = true; } else { gPrice = parseInt(gVal); } }
+  if (hasT && tVal) { if (tVal === "custom") { isCustom = true; } else { tPrice = parseInt(tVal) * tCountry; } }
+  if (setupVal !== "") { setupPrice = parseInt(setupVal); }
+
+  const totalCogs = gPrice + tPrice + setupPrice;
+  const acv = isCustom ? null : Math.round(totalCogs / (1 - marginPct / 100));
+  const marginUsd = isCustom ? null : acv - totalCogs;
+
+  const dsScopeLabels = { "": "", "google": "Google Search", "tiktok": "TikTok Search", "both": "Google + TikTok" };
+  const gScopeLabels = { "": "", "6000": "Standard regional tracking", "8000": "Advanced regional tracking", "custom": "Enterprise / custom" };
+  const tScopeLabels = { "": "", "5000": "1 topic", "15000": "5 topics", "25000": "10 topics", "custom": "Enterprise / custom" };
+  const setupLabels = { "": "", "0": "Meltwater-led setup", "3000": "OwlySearch-led setup" };
+
+  return {
+    client_name: getVal("client_name"),
+    opportunity_name: getVal("opportunity_name"),
+    sales_rep: getVal("sales_rep"),
+    data_source: dsScopeLabels[ds] || ds,
+    google_region: hasG ? getVal("google_region") : "",
+    google_scope: hasG ? (gScopeLabels[gVal] || gVal) : "",
+    tiktok_countries: hasT ? tCountry : "",
+    tiktok_scope: hasT ? (tScopeLabels[tVal] || tVal) : "",
+    setup_support: setupLabels[setupVal] || setupVal,
+    cogs_total: isCustom ? "Custom" : fmt(totalCogs),
+    margin_pct: isCustom ? "Custom" : marginPct + "%",
+    margin_usd: isCustom ? "Custom" : fmt(marginUsd),
+    client_acv: isCustom ? "Custom quote required" : fmt(acv),
+    notes: getVal("notes"),
+    business_need: getVal("business_need"),
+    timestamp: new Date().toISOString().replace("T", " ").substring(0, 19)
+  };
+}
+
+function setLoading(on) {
+  const btn = document.getElementById("btn_generate");
+  const txt = document.getElementById("btn_text");
+  const spin = document.getElementById("btn_spinner");
+  const arrow = document.getElementById("btn_arrow");
+  btn.disabled = on;
+  if (on) txt.textContent = "Submitting…";
+  spin.className = on ? "spinner show" : "spinner";
+  arrow.style.display = on ? "none" : "";
+}
+
+function setSendLoading(on) {}
+
+
+function showAlert(type, msg) {
+  const el = document.getElementById("alert_" + type);
+  const detail = document.getElementById(type + "_detail");
+  detail.textContent = msg;
+  el.className = "alert alert-" + type + " show";
+}
+
+function clearAlerts() {
+  ["alert_success", "alert_error"].forEach(id => {
+    document.getElementById(id).className = document.getElementById(id).className.replace(" show", "");
+  });
+}
+
+// ── Select description lookup data ──────────────────────────────────
+const dataSourceDescs = {
+  "google": "Monitor what people are actively searching for on Google — by keyword, location and time. Ideal for tracking brand search interest, share of search, and consumer intent shifts across a region.",
+  "tiktok": "Capture what users are searching and discovering on TikTok. Tracks trending topics, brand search volume, and category interest — unique signal unavailable from social listening tools.",
+  "both": "Combine Google and TikTok search data for a full picture of consumer intent across both platforms. Best for brands wanting to understand cross-channel search behaviour and how TikTok trends feed into Google demand."
+};
+const googleScopeDescs = {
+  "6000": "Standard regional tracking — Up to 1M keyword records, 1,000 active keywords tracked, 100 locations. Suitable for brands needing core category or brand-level search tracking within a single region.",
+  "8000": "Advanced regional tracking — Up to 2M keyword records, 5,000 active keywords, 200 locations. Recommended for deeper competitive tracking, multi-category coverage, or granular location-level insights.",
+  "custom": "Enterprise / custom — For clients with requirements beyond the standard tiers, including custom record volumes, keyword caps, location granularity, or multi-region bundling. OwlySearch will scope and price individually."
+};
+const tiktokScopeDescs = {
+  "5000": "1 topic per country — Track one defined topic (brand, category, trend or product area) per country. Best for focused brand monitoring or single-category insight at entry level.",
+  "15000": "5 topics per country — Track up to 5 topics per country. Suitable for brands monitoring multiple product lines, competitors, or category segments simultaneously.",
+  "25000": "10 topics per country — Track up to 10 topics per country. Recommended for comprehensive category or multi-brand tracking with broad competitive coverage.",
+  "custom": "Enterprise / custom — For clients needing more than 10 topics, custom topic definitions, or multi-country bundling beyond standard rates. OwlySearch will provide a tailored quote."
+};
+const setupDescs = {
+  "0": "Meltwater-led setup: The Meltwater account team manages the full setup process — including query preparation, keyword configuration, and client onboarding. There is no additional cost; this is included as part of the standard package. Best suited when the Meltwater team already has a deep understanding of the client's brief and market context.",
+  "3000": "OwlySearch-led setup: OwlySearch's specialist team takes full ownership of client onboarding end-to-end. This includes multilingual query design and normalisation, keyword taxonomy QA, data validation, and ongoing technical support throughout the contract. Strongly recommended for clients with complex briefs, multilingual or multi-market requirements, or those new to search behaviour data. One-off fee of USD 3,000."
+};
+
+function updateSelectDesc(id, descMap) {
+  const val = document.getElementById(id).value;
+  const descEl = document.getElementById(id + "_desc");
+  if (!descEl) return;
+  descEl.textContent = descMap[val] || "";
+  descEl.style.display = val && descMap[val] ? "block" : "none";
+}
+</script>
+
+<!-- EmailJS SDK — loaded async, used only when SERVICE_ID is configured -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+</body>
+</html>

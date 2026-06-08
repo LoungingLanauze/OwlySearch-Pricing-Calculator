@@ -644,10 +644,20 @@
         <label>Opportunity name <span class="req">*</span></label>
         <input type="text" id="opportunity_name" placeholder="e.g. Toyota APAC Pilot" />
       </div>
-      <div class="field full">
+      <div class="field">
         <label>Your email (Meltwater sales rep) <span class="req">*</span></label>
         <input type="email" id="sales_rep" placeholder="yourname@meltwater.com" />
         <p class="field-hint">Quote notification will be sent to you and vincent.ruaz@owlysearch.com</p>
+      </div>
+      <div class="field">
+        <label>Contract duration <span class="req">*</span></label>
+        <select id="contract_years">
+          <option value="">— Select duration —</option>
+          <option value="1">1 year</option>
+          <option value="2">2 years</option>
+          <option value="3">3 years</option>
+        </select>
+        <p class="field-hint">Affects how the implementation cost is annualised</p>
       </div>
     </div>
   </div>
@@ -672,13 +682,13 @@
     <!-- Google fields -->
     <div id="google_block" class="cond">
       <div class="section-note">
-        Google Search Behavior tracking is priced <strong>per region, per year</strong>. Each region requires a separate package.
+        Google Search tracking is priced <strong>per region, per year</strong>. The package price is multiplied by the number of regions. Google country count is used only to calculate implementation cost when OwlySearch setup is selected.
       </div>
       <div class="grid-2" style="margin-bottom:16px;">
         <div class="field">
-          <label>Google region <span class="req">*</span></label>
+          <label>Google region(s) <span class="req">*</span></label>
           <select id="google_region">
-            <option value="">— Select region —</option>
+            <option value="">— Select primary region —</option>
             <option>SEA</option>
             <option>North Asia</option>
             <option>South Asia</option>
@@ -688,17 +698,28 @@
             <option>LATAM</option>
             <option>MEA</option>
           </select>
+          <p class="field-hint">Select primary region; enter total count below</p>
+        </div>
+        <div class="field">
+          <label>Number of Google regions <span class="req">*</span></label>
+          <input type="number" id="google_region_count" min="1" max="8" value="1" placeholder="1" />
+          <p class="field-hint">Package price × region count</p>
         </div>
         <div class="field">
           <label>Google scope <span class="req">*</span></label>
-          <select id="google_scope" onchange="recalc(); updateSelectDesc('google_scope', googleScopeDescs)">
+          <select id="google_scope" onchange="updateSelectDesc('google_scope', googleScopeDescs)">
             <option value="">— Select scope —</option>
-            <option value="6000">Standard regional tracking — USD 6,000/yr</option>
-            <option value="8000">Advanced regional tracking — USD 8,000/yr</option>
+            <option value="6000">Standard regional tracking — €6,000/region/yr</option>
+            <option value="8000">Advanced regional tracking — €8,000/region/yr</option>
             <option value="custom">Enterprise / custom — Custom quote</option>
           </select>
           <p class="field-hint select-desc" id="google_scope_desc"></p>
           <p class="field-hint" id="google_hint"></p>
+        </div>
+        <div class="field">
+          <label>Number of Google countries / markets <span class="req">*</span></label>
+          <input type="number" id="google_country_count" min="1" max="50" value="1" placeholder="1" />
+          <p class="field-hint">Used only to calculate OwlySearch implementation cost (USD 250/country)</p>
         </div>
       </div>
     </div>
@@ -706,21 +727,21 @@
     <!-- TikTok fields -->
     <div id="tiktok_block" class="cond">
       <div class="section-note">
-        TikTok Search Behavior tracking is priced <strong>per country, per year</strong>. Enter total number of countries.
+        TikTok Search tracking is priced <strong>per country, per year</strong>. The scope price is multiplied by the number of countries.
       </div>
       <div class="grid-2" style="margin-bottom:16px;">
         <div class="field">
           <label>Number of TikTok countries <span class="req">*</span></label>
-          <input type="number" id="tiktok_country" min="1" max="50" value="1" placeholder="1" oninput="recalc()" />
-          <p class="field-hint">Each additional country multiplies the per-country rate</p>
+          <input type="number" id="tiktok_country_count" min="1" max="50" value="1" placeholder="1" />
+          <p class="field-hint">Scope price × country count</p>
         </div>
         <div class="field">
           <label>TikTok topic scope <span class="req">*</span></label>
-          <select id="tiktok_scope" onchange="recalc(); updateSelectDesc('tiktok_scope', tiktokScopeDescs)">
+          <select id="tiktok_scope" onchange="updateSelectDesc('tiktok_scope', tiktokScopeDescs)">
             <option value="">— Select scope —</option>
-            <option value="5000">1 topic — USD 5,000/country/yr</option>
-            <option value="15000">5 topics — USD 15,000/country/yr</option>
-            <option value="25000">10 topics — USD 25,000/country/yr</option>
+            <option value="5000">1 topic — €5,000/country/yr</option>
+            <option value="15000">5 topics — €15,000/country/yr</option>
+            <option value="25000">10 topics — €25,000/country/yr</option>
             <option value="custom">Enterprise / custom — Custom quote</option>
           </select>
           <p class="field-hint select-desc" id="tiktok_scope_desc"></p>
@@ -733,10 +754,10 @@
     <div class="grid-2">
       <div class="field full">
         <label>Client setup &amp; onboarding <span class="req">*</span></label>
-        <select id="setup_support" onchange="recalc(); updateSelectDesc('setup_support', setupDescs)">
+        <select id="setup_support" onchange="updateSelectDesc('setup_support', setupDescs)">
           <option value="">— Select setup option —</option>
-          <option value="0">Meltwater-led setup — Included, no additional cost</option>
-          <option value="3000">OwlySearch-led setup — USD 3,000 one-off fee</option>
+          <option value="meltwater">Meltwater-led setup — Included, no additional cost</option>
+          <option value="owlysearch">OwlySearch-led setup — USD 250 per Google country (annualised)</option>
         </select>
         <p class="field-hint select-desc" id="setup_support_desc"></p>
       </div>
@@ -814,8 +835,8 @@
       </div>
       <div class="line-item cogs-total-line">
         <div class="li-left">
-          <div class="li-name" style="font-weight:600;">Total COGs</div>
-          <div class="li-desc">Partner cost — do not share with client</div>
+          <div class="li-name" style="font-weight:600;">Total annual COGs</div>
+          <div class="li-desc">Partner cost · EUR · per year — do not share with client</div>
         </div>
         <div class="li-price" id="cogs_total_display" style="color:var(--mw-text-muted);">—</div>
       </div>
@@ -924,7 +945,7 @@ let computedCogs = 0;
 let cogsIsCustom = false;
 
 function fmt(n) {
-  return "USD " + Math.round(n).toLocaleString("en-US");
+  return "€" + Math.round(n).toLocaleString("en-US");
 }
 
 function updateFields() {
@@ -940,33 +961,56 @@ function calcCogs() {
   const ds = document.getElementById("data_source").value;
   const gVal = document.getElementById("google_scope").value;
   const tVal = document.getElementById("tiktok_scope").value;
-  const tCountry = Math.max(1, parseInt(document.getElementById("tiktok_country").value) || 1);
+  const gRegionCount = Math.max(1, parseInt(document.getElementById("google_region_count")?.value) || 1);
+  const gCountryCount = Math.max(1, parseInt(document.getElementById("google_country_count")?.value) || 1);
+  const tCountry = Math.max(1, parseInt(document.getElementById("tiktok_country_count")?.value) || 1);
   const setupVal = document.getElementById("setup_support").value;
+  const contractYears = Math.max(1, parseInt(document.getElementById("contract_years")?.value) || 1);
   const hasG = ds === "google" || ds === "both";
   const hasT = ds === "tiktok" || ds === "both";
 
-  let gPrice = 0, tPrice = 0, setupPrice = 0, isCustom = false;
-  if (hasG && gVal) { if (gVal === "custom") { isCustom = true; } else { gPrice = parseInt(gVal); } }
-  if (hasT && tVal) { if (tVal === "custom") { isCustom = true; } else { tPrice = parseInt(tVal) * tCountry; } }
-  if (setupVal !== "") { setupPrice = parseInt(setupVal); }
+  let gPrice = 0, tPrice = 0, implCost = 0, annualImpl = 0, isCustom = false;
 
-  return { gPrice, tPrice, setupPrice, isCustom, hasG, hasT, tCountry, gVal, tVal, setupVal };
+  // Google: scope price × region count
+  if (hasG && gVal) {
+    if (gVal === "custom") { isCustom = true; }
+    else { gPrice = parseInt(gVal) * gRegionCount; }
+  }
+
+  // TikTok: scope price × country count
+  if (hasT && tVal) {
+    if (tVal === "custom") { isCustom = true; }
+    else { tPrice = parseInt(tVal) * tCountry; }
+  }
+
+  // Implementation: only if OwlySearch setup AND Google is included
+  if (setupVal === "owlysearch" && hasG) {
+    implCost = gCountryCount * 250;
+    annualImpl = implCost / contractYears;
+  }
+
+  return { gPrice, tPrice, implCost, annualImpl, isCustom, hasG, hasT,
+           tCountry, gRegionCount, gCountryCount, gVal, tVal, setupVal, contractYears };
 }
 
 function renderBreakdown() {
   const ds = document.getElementById("data_source").value;
-  const { gPrice, tPrice, setupPrice, isCustom, hasG, hasT, tCountry, gVal, tVal, setupVal } = calcCogs();
+  const { gPrice, tPrice, implCost, annualImpl, isCustom, hasG, hasT,
+          tCountry, gRegionCount, gCountryCount, gVal, tVal, setupVal, contractYears } = calcCogs();
 
   // Google line
   if (hasG) {
     document.getElementById("google_line").style.display = "flex";
-    document.getElementById("google_desc").textContent = GOOGLE_HINTS[gVal] || "Select scope above";
     if (gVal === "custom") {
       setPriceEl("google_price_display", "Custom quote", "custom");
+      document.getElementById("google_desc").textContent = GOOGLE_HINTS["custom"];
     } else if (gVal) {
       setPriceEl("google_price_display", fmt(gPrice), "");
+      document.getElementById("google_desc").textContent =
+        gRegionCount + " region" + (gRegionCount !== 1 ? "s" : "") + " × " + fmt(parseInt(gVal)) + "/region · " + GOOGLE_HINTS[gVal];
     } else {
       setPriceEl("google_price_display", "—", "pending");
+      document.getElementById("google_desc").textContent = "Select scope above";
     }
   } else {
     document.getElementById("google_line").style.display = "none";
@@ -977,10 +1021,11 @@ function renderBreakdown() {
     document.getElementById("tiktok_line").style.display = "flex";
     if (tVal === "custom") {
       setPriceEl("tiktok_price_display", "Custom quote", "custom");
-      document.getElementById("tiktok_desc").textContent = TIKTOK_HINTS[tVal];
+      document.getElementById("tiktok_desc").textContent = TIKTOK_HINTS["custom"];
     } else if (tVal) {
       setPriceEl("tiktok_price_display", fmt(tPrice), "");
-      document.getElementById("tiktok_desc").textContent = tCountry + " countr" + (tCountry !== 1 ? "ies" : "y") + " × " + TIKTOK_HINTS[tVal];
+      document.getElementById("tiktok_desc").textContent =
+        tCountry + " countr" + (tCountry !== 1 ? "ies" : "y") + " × " + TIKTOK_HINTS[tVal];
     } else {
       setPriceEl("tiktok_price_display", "—", "pending");
       document.getElementById("tiktok_desc").textContent = "Select scope above";
@@ -989,33 +1034,36 @@ function renderBreakdown() {
     document.getElementById("tiktok_line").style.display = "none";
   }
 
-  // Setup line
+  // Implementation / setup line
   if (setupVal !== "") {
     document.getElementById("setup_line").style.display = "flex";
-    const sp = parseInt(setupVal);
-    if (sp === 0) {
+    if (setupVal === "meltwater") {
       setPriceEl("setup_price_display", "Included", "zero");
-      document.getElementById("setup_desc").textContent = "Meltwater manages onboarding";
-    } else {
-      setPriceEl("setup_price_display", fmt(sp), "");
-      document.getElementById("setup_desc").textContent = "OwlySearch multilingual onboarding, normalisation & QA";
+      document.getElementById("setup_desc").textContent = "Meltwater manages setup and onboarding";
+    } else if (setupVal === "owlysearch" && hasG) {
+      setPriceEl("setup_price_display", fmt(annualImpl) + "/yr", "");
+      document.getElementById("setup_desc").textContent =
+        gCountryCount + " countr" + (gCountryCount !== 1 ? "ies" : "y") + " × USD 250 = " + fmt(implCost) +
+        " total ÷ " + contractYears + " yr" + (contractYears !== 1 ? "s" : "") + " = " + fmt(annualImpl) + "/yr";
+    } else if (setupVal === "owlysearch" && !hasG) {
+      setPriceEl("setup_price_display", "Included", "zero");
+      document.getElementById("setup_desc").textContent = "No Google countries selected — implementation included";
     }
   } else {
     document.getElementById("setup_line").style.display = "none";
   }
 
-  // COGs total row
+  // Annual COGs total
+  const annualTotal = gPrice + tPrice + annualImpl;
   if (isCustom) {
     setPriceEl("cogs_total_display", "Custom — contact OwlySearch", "custom");
   } else {
-    const total = gPrice + tPrice + setupPrice;
-    setPriceEl("cogs_total_display", fmt(total), total > 0 ? "" : "pending");
+    setPriceEl("cogs_total_display", fmt(annualTotal), annualTotal > 0 ? "" : "pending");
   }
 
-  // Custom note
   document.getElementById("custom_note").className = isCustom ? "custom-note show" : "custom-note";
 
-  return { gPrice, tPrice, setupPrice, isCustom };
+  return { gPrice, tPrice, implCost, annualImpl, annualTotal: annualTotal, isCustom };
 }
 
 // Runs only after form submission
@@ -1103,41 +1151,46 @@ function buildPayload() {
   const hasT = ds === "tiktok" || ds === "both";
   const gVal = hasG ? document.getElementById("google_scope").value : "";
   const tVal = hasT ? document.getElementById("tiktok_scope").value : "";
-  const tCountry = hasT ? Math.max(1, parseInt(document.getElementById("tiktok_country").value) || 1) : 0;
+  const gRegionCount = hasG ? (Math.max(1, parseInt(document.getElementById("google_region_count")?.value) || 1)) : 0;
+  const gCountryCount = hasG ? (Math.max(1, parseInt(document.getElementById("google_country_count")?.value) || 1)) : 0;
+  const tCountry = hasT ? (Math.max(1, parseInt(document.getElementById("tiktok_country_count")?.value) || 1)) : 0;
   const setupVal = document.getElementById("setup_support").value;
+  const contractYears = Math.max(1, parseInt(document.getElementById("contract_years")?.value) || 1);
+  const marginPct = parseInt(document.getElementById("margin_input").value) || 30;
 
-  let gPrice = 0, tPrice = 0, setupPrice = 0, isCustom = false;
-  if (hasG && gVal) { if (gVal === "custom") { isCustom = true; } else { gPrice = parseInt(gVal); } }
+  let gPrice = 0, tPrice = 0, implCost = 0, annualImpl = 0, isCustom = false;
+  if (hasG && gVal) { if (gVal === "custom") { isCustom = true; } else { gPrice = parseInt(gVal) * gRegionCount; } }
   if (hasT && tVal) { if (tVal === "custom") { isCustom = true; } else { tPrice = parseInt(tVal) * tCountry; } }
-  if (setupVal !== "") { setupPrice = parseInt(setupVal); }
+  if (setupVal === "owlysearch" && hasG) { implCost = gCountryCount * 250; annualImpl = implCost / contractYears; }
 
-  const dsScopeLabels = {
-    "": "", "google": "Google Search", "tiktok": "TikTok Search", "both": "Google + TikTok"
-  };
-  const gScopeLabels = {
-    "": "", "6000": "Standard regional tracking", "8000": "Advanced regional tracking", "custom": "Enterprise / custom"
-  };
-  const tScopeLabels = {
-    "": "", "5000": "1 topic", "15000": "5 topics", "25000": "10 topics", "custom": "Enterprise / custom"
-  };
-  const setupLabels = {
-    "": "", "0": "Meltwater setup", "3000": "OwlySearch setup"
-  };
+  const annualCogs = gPrice + tPrice + annualImpl;
+  const acv = isCustom ? null : Math.round(annualCogs / (1 - marginPct / 100));
+  const marginEur = isCustom ? null : acv - annualCogs;
+
+  const dsScopeLabels = { "": "", "google": "Google Search", "tiktok": "TikTok Search", "both": "Google + TikTok" };
+  const gScopeLabels = { "": "", "6000": "Standard regional tracking", "8000": "Advanced regional tracking", "custom": "Enterprise / custom" };
+  const tScopeLabels = { "": "", "5000": "1 topic", "15000": "5 topics", "25000": "10 topics", "custom": "Enterprise / custom" };
+  const setupLabels = { "": "", "meltwater": "Meltwater-led setup", "owlysearch": "OwlySearch-led setup" };
 
   return {
     client_name: getVal("client_name"),
     opportunity_name: getVal("opportunity_name"),
     sales_rep: getVal("sales_rep"),
+    contract_duration: contractYears + " year" + (contractYears !== 1 ? "s" : ""),
     data_source: dsScopeLabels[ds] || ds,
     google_region: hasG ? getVal("google_region") : "",
+    google_region_count: hasG ? gRegionCount : "",
     google_scope: hasG ? (gScopeLabels[gVal] || gVal) : "",
-    tiktok_countries: hasT ? tCountry : "",
+    google_country_count: hasG ? gCountryCount : "",
+    tiktok_country_count: hasT ? tCountry : "",
     tiktok_scope: hasT ? (tScopeLabels[tVal] || tVal) : "",
     setup_support: setupLabels[setupVal] || setupVal,
-    google_price: isCustom ? "Custom" : (hasG ? gPrice : ""),
-    tiktok_price: isCustom ? "Custom" : (hasT ? tPrice : ""),
-    setup_price: setupPrice,
-    total_quote: isCustom ? "Custom quote required" : fmt(gPrice + tPrice + setupPrice),
+    implementation_cost: setupVal === "owlysearch" && hasG ? fmt(implCost) : "€0",
+    annualized_implementation: setupVal === "owlysearch" && hasG ? fmt(annualImpl) + "/yr" : "€0",
+    cogs_total: isCustom ? "Custom" : fmt(annualCogs) + "/yr",
+    margin_pct: isCustom ? "Custom" : marginPct + "%",
+    margin_eur: isCustom ? "Custom" : fmt(marginEur),
+    client_acv: isCustom ? "Custom quote required" : fmt(acv) + "/yr",
     notes: getVal("notes"),
     business_need: getVal("business_need"),
     timestamp: new Date().toISOString().replace("T", " ").substring(0, 19)
@@ -1151,8 +1204,9 @@ async function generateQuote() {
   const ds = document.getElementById("data_source").value;
   const setup = document.getElementById("setup_support").value;
   const bizNeed = getVal("business_need");
+  const contractYears = document.getElementById("contract_years").value;
 
-  if (!client || !opp || !rep || !ds || setup === "" || !bizNeed) {
+  if (!client || !opp || !rep || !ds || setup === "" || !bizNeed || !contractYears) {
     showAlert("error", "Please fill in all required fields before submitting.");
     return;
   }
@@ -1165,8 +1219,8 @@ async function generateQuote() {
   setLoading(true);
 
   // Compute and render COGs
-  const { gPrice, tPrice, setupPrice, isCustom } = renderBreakdown();
-  computedCogs = gPrice + tPrice + setupPrice;
+  const { gPrice, tPrice, implCost, annualImpl, annualTotal, isCustom } = renderBreakdown();
+  computedCogs = annualTotal;
   cogsIsCustom = isCustom;
 
   // Show pricing section
@@ -1259,10 +1313,14 @@ function resetForm() {
   ["client_name","opportunity_name","sales_rep","notes","business_need"].forEach(id => {
     document.getElementById(id).value = "";
   });
-  ["data_source","google_region","google_scope","tiktok_scope","setup_support"].forEach(id => {
-    document.getElementById(id).selectedIndex = 0;
+  ["data_source","google_region","google_scope","tiktok_scope","setup_support","contract_years"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.selectedIndex = 0;
   });
-  document.getElementById("tiktok_country").value = 1;
+  ["tiktok_country_count","google_region_count","google_country_count"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = 1;
+  });
 
   // Hide conditional blocks
   document.getElementById("google_block").className = "cond";
@@ -1380,8 +1438,8 @@ const tiktokScopeDescs = {
   "custom": "Enterprise / custom — For clients needing more than 10 topics, custom topic definitions, or multi-country bundling beyond standard rates. OwlySearch will provide a tailored quote."
 };
 const setupDescs = {
-  "0": "Meltwater-led setup: The Meltwater account team manages the full setup process — including query preparation, keyword configuration, and client onboarding. There is no additional cost; this is included as part of the standard package. Best suited when the Meltwater team already has a deep understanding of the client's brief and market context.",
-  "3000": "OwlySearch-led setup: OwlySearch's specialist team takes full ownership of client onboarding end-to-end. This includes multilingual query design and normalisation, keyword taxonomy QA, data validation, and ongoing technical support throughout the contract. Strongly recommended for clients with complex briefs, multilingual or multi-market requirements, or those new to search behaviour data. One-off fee of USD 3,000."
+  "meltwater": "Meltwater-led setup: The Meltwater account team manages the full setup process — including query preparation, keyword configuration, and client onboarding. There is no additional cost; this is included as part of the standard package.",
+  "owlysearch": "OwlySearch-led setup: OwlySearch's specialist team takes full ownership of onboarding end-to-end — country configuration, multilingual query design, normalisation, QA, and ongoing support. Priced at USD 250 per Google country, spread across the contract duration. For a 1-year contract with 5 countries that's USD 1,250/yr; for a 3-year contract it's ~USD 417/yr. TikTok countries are not included in the implementation cost."
 };
 
 function updateSelectDesc(id, descMap) {

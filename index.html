@@ -1158,7 +1158,7 @@ function refreshCountryPills() {
 }
 
 function getSelectedRegions() {
-  return Array.from(document.querySelectorAll(".region-pill.selected"))
+  return Array.from(document.querySelectorAll("#region_pills .region-pill.selected"))
     .map(el => el.dataset.region);
 }
 
@@ -1601,7 +1601,7 @@ function resetForm() {
     if (el) el.value = 1;
   });
   // Deselect all region pills (Google + TikTok)
-  document.querySelectorAll(".region-pill.selected").forEach(p => p.classList.remove("selected"));
+  document.querySelectorAll("#region_pills .region-pill.selected, #tiktok_region_pills .region-pill.selected").forEach(p => p.classList.remove("selected"));
   const hint = document.getElementById("region_selection_hint");
   if (hint) { hint.textContent = "Select one or more regions — price will update automatically"; hint.style.color = ""; }
   const tikRegionHint = document.getElementById("tiktok_region_hint");

@@ -789,18 +789,32 @@
     </div>
     <!-- TikTok fields -->
     <div id="tiktok_block" class="cond">
-      <div class="section-note">
-        TikTok Search tracking is priced <strong>per country, per year</strong>. The scope price is multiplied by the number of countries.
+
+      <div class="region-explainer">
+        <div class="region-explainer-icon">💡</div>
+        <div>
+          <strong>How TikTok country pricing works:</strong> Select the regions your client operates in, then pick the specific countries. Pricing is per country — so 5 countries at the 5-topic scope = $75,000/yr. No implementation cost applies for TikTok.
+        </div>
       </div>
+
       <div class="grid-2" style="margin-bottom:16px;">
-        <div class="field">
-          <label>Number of TikTok countries <span class="req">*</span></label>
-          <input type="number" id="tiktok_country_count" min="1" max="50" value="1" placeholder="1" />
-          <p class="field-hint">Scope price × country count</p>
+        <div class="field full">
+          <label>TikTok regions <span class="req">*</span></label>
+          <div class="region-pill-group" id="tiktok_region_pills">
+            <button type="button" class="region-pill" data-region="SEA" onclick="toggleTikTokRegion(this)">SEA</button>
+            <button type="button" class="region-pill" data-region="North Asia" onclick="toggleTikTokRegion(this)">North Asia</button>
+            <button type="button" class="region-pill" data-region="South Asia" onclick="toggleTikTokRegion(this)">South Asia</button>
+            <button type="button" class="region-pill" data-region="Western Europe" onclick="toggleTikTokRegion(this)">Western Europe</button>
+            <button type="button" class="region-pill" data-region="Eastern Europe" onclick="toggleTikTokRegion(this)">Eastern Europe</button>
+            <button type="button" class="region-pill" data-region="North America" onclick="toggleTikTokRegion(this)">North America</button>
+            <button type="button" class="region-pill" data-region="LATAM" onclick="toggleTikTokRegion(this)">LATAM</button>
+            <button type="button" class="region-pill" data-region="MEA" onclick="toggleTikTokRegion(this)">MEA</button>
+          </div>
+          <p class="field-hint" id="tiktok_region_hint">Select one or more regions to see available countries</p>
         </div>
         <div class="field">
           <label>TikTok topic scope <span class="req">*</span></label>
-          <select id="tiktok_scope" onchange="updateSelectDesc('tiktok_scope', tiktokScopeDescs)">
+          <select id="tiktok_scope" onchange="updateSelectDesc('tiktok_scope', tiktokScopeDescs); refreshTikTokCountryHint()">
             <option value="">— Select scope —</option>
             <option value="5000">1 topic — $5,000/country/yr</option>
             <option value="15000">5 topics — $15,000/country/yr</option>
@@ -811,6 +825,14 @@
           <p class="field-hint" id="tiktok_hint"></p>
         </div>
       </div>
+
+      <div class="field full" id="tiktok_country_pill_block" style="display:none; margin-bottom:16px;">
+        <label>TikTok countries within selected regions <span class="req">*</span></label>
+        <p class="field-hint" style="margin-bottom:10px;">Select each country the client wants TikTok tracking for. Price = country count × scope rate.</p>
+        <div class="region-pill-group" id="tiktok_country_pills"></div>
+        <p class="field-hint" id="tiktok_country_hint" style="margin-top:8px;">No countries selected yet</p>
+      </div>
+
     </div>
 
     <!-- Setup -->
@@ -1046,6 +1068,74 @@ function updateCountryHint() {
   }
 }
 
+// ── TikTok region + country pill logic ──────────────────────────────
+
+function getSelectedTikTokRegions() {
+  return Array.from(document.querySelectorAll("#tiktok_region_pills .region-pill.selected"))
+    .map(el => el.dataset.region);
+}
+
+function getSelectedTikTokCountries() {
+  return Array.from(document.querySelectorAll(".tiktok-country-pill.selected"))
+    .map(el => el.dataset.country);
+}
+
+function toggleTikTokRegion(btn) {
+  btn.classList.toggle("selected");
+  const selected = getSelectedTikTokRegions();
+  const hint = document.getElementById("tiktok_region_hint");
+  if (selected.length === 0) {
+    hint.textContent = "Select one or more regions to see available countries";
+    hint.style.color = "";
+  } else {
+    hint.textContent = `${selected.length} region${selected.length !== 1 ? "s" : ""} selected: ${selected.join(", ")}`;
+    hint.style.color = "var(--mw-teal)";
+  }
+  refreshTikTokCountryPills();
+}
+
+function toggleTikTokCountry(btn) {
+  btn.classList.toggle("selected");
+  refreshTikTokCountryHint();
+}
+
+function refreshTikTokCountryHint() {
+  const selected = getSelectedTikTokCountries();
+  const hint = document.getElementById("tiktok_country_hint");
+  if (!hint) return;
+  if (selected.length === 0) {
+    hint.textContent = "No countries selected yet";
+    hint.style.color = "";
+  } else {
+    const scopeVal = document.getElementById("tiktok_scope").value;
+    const scopePrice = scopeVal && scopeVal !== "custom" ? parseInt(scopeVal) : null;
+    const priceStr = scopePrice ? ` = $${(scopePrice * selected.length).toLocaleString("en-US")}/yr` : "";
+    hint.textContent = `${selected.length} countr${selected.length !== 1 ? "ies" : "y"} selected: ${selected.join(", ")}${priceStr}`;
+    hint.style.color = "var(--mw-teal)";
+  }
+}
+
+function refreshTikTokCountryPills() {
+  const block = document.getElementById("tiktok_country_pill_block");
+  const container = document.getElementById("tiktok_country_pills");
+  const selectedRegions = getSelectedTikTokRegions();
+
+  if (selectedRegions.length > 0) {
+    block.style.display = "block";
+    const alreadySelected = getSelectedTikTokCountries();
+    const allCountries = [...new Set(selectedRegions.flatMap(r => REGION_COUNTRIES[r] || []))];
+    container.innerHTML = allCountries.map(c =>
+      `<button type="button" class="region-pill tiktok-country-pill${alreadySelected.includes(c) ? " selected" : ""}" data-country="${c}" onclick="toggleTikTokCountry(this)">${c}</button>`
+    ).join("");
+    refreshTikTokCountryHint();
+  } else {
+    block.style.display = "none";
+    container.innerHTML = "";
+    const hint = document.getElementById("tiktok_country_hint");
+    if (hint) { hint.textContent = "No countries selected yet"; hint.style.color = ""; }
+  }
+}
+
 function refreshCountryPills() {
   const block = document.getElementById("country_pill_block");
   const container = document.getElementById("country_pills");
@@ -1139,7 +1229,7 @@ function calcCogs() {
   const tVal = document.getElementById("tiktok_scope").value;
   const gRegionCount = hasG ? Math.max(1, getSelectedRegions().length) : 0;
   const gCountryCount = hasG ? Math.max(0, getSelectedCountries().length) : 0;
-  const tCountry = Math.max(1, parseInt(document.getElementById("tiktok_country_count")?.value) || 1);
+  const tCountry = hasT ? Math.max(1, getSelectedTikTokCountries().length || 1) : 0;
   const setupVal = document.getElementById("setup_support").value;
   const contractYears = Math.max(1, parseInt(document.getElementById("contract_years")?.value) || 1);
 
@@ -1199,9 +1289,13 @@ function renderBreakdown() {
       setPriceEl("tiktok_price_display", "Custom quote", "custom");
       document.getElementById("tiktok_desc").textContent = TIKTOK_HINTS["custom"];
     } else if (tVal) {
+      const selectedTikTokCountries = getSelectedTikTokCountries();
+      const countryLabel = selectedTikTokCountries.length > 0
+        ? selectedTikTokCountries.join(", ")
+        : tCountry + " countr" + (tCountry !== 1 ? "ies" : "y");
       setPriceEl("tiktok_price_display", fmt(tPrice), "");
       document.getElementById("tiktok_desc").textContent =
-        tCountry + " countr" + (tCountry !== 1 ? "ies" : "y") + " × " + TIKTOK_HINTS[tVal];
+        countryLabel + " · " + TIKTOK_HINTS[tVal];
     } else {
       setPriceEl("tiktok_price_display", "—", "pending");
       document.getElementById("tiktok_desc").textContent = "Select scope above";
@@ -1334,7 +1428,8 @@ function buildPayload() {
   const gRegionCount = hasG ? Math.max(1, regionNames.length) : 0;
   const countryNames = hasG ? getSelectedCountries() : [];
   const gCountryCount = hasG ? countryNames.length : 0;
-  const tCountry = hasT ? (Math.max(1, parseInt(document.getElementById("tiktok_country_count")?.value) || 1)) : 0;
+  const tiktokCountryNames = hasT ? getSelectedTikTokCountries() : [];
+  const tCountry = hasT ? Math.max(1, tiktokCountryNames.length || 1) : 0;
   const setupVal = document.getElementById("setup_support").value;
   const contractYears = Math.max(1, parseInt(document.getElementById("contract_years")?.value) || 1);
   const marginPct = parseInt(document.getElementById("margin_input").value) || 30;
@@ -1366,6 +1461,7 @@ function buildPayload() {
     google_country_count: hasG ? gCountryCount : "",
     google_countries: hasG ? (countryNames.join(", ") || "") : "",
     tiktok_country_count: hasT ? tCountry : "",
+    tiktok_countries: hasT ? (tiktokCountryNames.join(", ") || "") : "",
     tiktok_scope: hasT ? (tScopeLabels[tVal] || tVal) : "",
     setup_support: setupLabels[setupVal] || setupVal,
     implementation_cost: setupVal === "owlysearch" && hasG ? fmt(implCost) : "$0",
@@ -1504,17 +1600,26 @@ function resetForm() {
     const el = document.getElementById(id);
     if (el) el.value = 1;
   });
-  // Deselect all region pills
+  // Deselect all region pills (Google + TikTok)
   document.querySelectorAll(".region-pill.selected").forEach(p => p.classList.remove("selected"));
   const hint = document.getElementById("region_selection_hint");
   if (hint) { hint.textContent = "Select one or more regions — price will update automatically"; hint.style.color = ""; }
-  // Hide and clear country pills
+  const tikRegionHint = document.getElementById("tiktok_region_hint");
+  if (tikRegionHint) { tikRegionHint.textContent = "Select one or more regions to see available countries"; tikRegionHint.style.color = ""; }
+  // Hide and clear Google country pills
   const countryBlock = document.getElementById("country_pill_block");
   if (countryBlock) countryBlock.style.display = "none";
   const countryContainer = document.getElementById("country_pills");
   if (countryContainer) countryContainer.innerHTML = "";
   const countryHint = document.getElementById("country_selection_hint");
   if (countryHint) { countryHint.textContent = "No countries selected yet"; countryHint.style.color = ""; }
+  // Hide and clear TikTok country pills
+  const tikCountryBlock = document.getElementById("tiktok_country_pill_block");
+  if (tikCountryBlock) tikCountryBlock.style.display = "none";
+  const tikCountryContainer = document.getElementById("tiktok_country_pills");
+  if (tikCountryContainer) tikCountryContainer.innerHTML = "";
+  const tikCountryHint = document.getElementById("tiktok_country_hint");
+  if (tikCountryHint) { tikCountryHint.textContent = "No countries selected yet"; tikCountryHint.style.color = ""; }
 
   // Hide conditional blocks
   document.getElementById("google_block").className = "cond";

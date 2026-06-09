@@ -1133,6 +1133,8 @@ function updateSetupLabel(ds) {
 // Internal price calculation — does NOT display results
 function calcCogs() {
   const ds = document.getElementById("data_source").value;
+  const hasG = ds === "google" || ds === "both";
+  const hasT = ds === "tiktok" || ds === "both";
   const gVal = document.getElementById("google_scope").value;
   const tVal = document.getElementById("tiktok_scope").value;
   const gRegionCount = hasG ? Math.max(1, getSelectedRegions().length) : 0;
@@ -1140,8 +1142,6 @@ function calcCogs() {
   const tCountry = Math.max(1, parseInt(document.getElementById("tiktok_country_count")?.value) || 1);
   const setupVal = document.getElementById("setup_support").value;
   const contractYears = Math.max(1, parseInt(document.getElementById("contract_years")?.value) || 1);
-  const hasG = ds === "google" || ds === "both";
-  const hasT = ds === "tiktok" || ds === "both";
 
   let gPrice = 0, tPrice = 0, implCost = 0, annualImpl = 0, isCustom = false;
 
